@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Display Properties</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Container */
+  .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Form */
+  form {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Labels */
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  /* Inputs */
+  input[type="number"],
+  input[type="checkbox"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  /* Button */
+  button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: #fff;
+  }
+
+</style>
+
+
+</head>
+<body>
+
+<label for="priceFilter">Price Filter:</label>
+<input type="number" id="priceFilter" placeholder="Enter maximum price">
+
+<label for="parkingFilter">Parking:</label>
+<input type="checkbox" id="parkingFilter" value="Y">
+<label for="gardenFilter">Garden:</label>
+<input type="checkbox" id="gardenFilter" value="Y">
+<label for="swimmingPoolFilter">Swimming Pool:</label>
+<input type="checkbox" id="swimmingPoolFilter" value="Y">
+<label for="homeTheatreFilter">Home Theatre:</label>
+<input type="checkbox" id="homeTheatreFilter" value="Y">
+
+<button onclick="fetchProperties()">Show Properties</button>
+
+<table id="propertiesTable">
+  <thead>
+    <tr>
+      <th>Property ID</th>
+      <th>Tenant ID</th>
+      <th>Address</th>
+      <th>Rooms</th>
+      <th>Bedrooms</th>
+      <th>Area</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody id="propertiesBody">
+    <!-- Properties will be inserted here -->
+  </tbody>
+</table>
+
+<script>
+function fetchProperties() {
+  const priceFilter = document.getElementById('priceFilter').value;
+  const parkingFilter = document.getElementById('parkingFilter').checked ? 'Y' : '';
+  const gardenFilter = document.getElementById('gardenFilter').checked ? 'Y' : '';
+  const swimmingPoolFilter = document.getElementById('swimmingPoolFilter').checked ? 'Y' : '';
+  const homeTheatreFilter = document.getElementById('homeTheatreFilter').checked ? 'Y' : '';
+
+  const queryParams = [];
+  if (priceFilter) {
+    queryParams.push(`price=${priceFilter}`);
+  }
+  if (parkingFilter) {
+    queryParams.push(`parking=${parkingFilter}`);
+  }
+  if (gardenFilter) {
+    queryParams.push(`garden=${gardenFilter}`);
+  }
+  if (swimmingPoolFilter) {
+    queryParams.push(`swimmingPool=${swimmingPoolFilter}`);
+  }
+  if (homeTheatreFilter) {
+    queryParams.push(`homeTheatre=${homeTheatreFilter}`);
+  }
+  const queryString = queryParams.join('&');
+
+  fetch(`http://localhost:3002/fetch_properties?${queryString}`)
+    .then(response => response.json())
+    .then(data => {
+      const propertiesBody = document.getElementById('propertiesBody');
+      propertiesBody.innerHTML = ''; // Clear existing rows
+      
+      data.forEach(property => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${property[0]}</td>
+          <td>${property[1]}</td>
+          <td>${property[2]}</td>
+          <td>${property[3]}</td>
+          <td>${property[4]}</td>
+          <td>${property[5]}</td>
+          <td>${property[6]}</td>
+        `;
+        propertiesBody.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching properties:', error);
+    });
+}
+</script>
+
+</body>
+</html>
